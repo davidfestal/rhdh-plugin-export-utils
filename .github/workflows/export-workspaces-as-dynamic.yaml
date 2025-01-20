@@ -84,7 +84,6 @@ jobs:
         id: gather-workspaces
         shell: bash
         run: |
-          set -x
           workspacePath=''
           if [[ "${{ inputs.workspace-path }}" != "" ]]
           then

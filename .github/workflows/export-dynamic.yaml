@@ -5,13 +5,11 @@ on:
       node-version:
         description: node-version to execute the export
         type: string
-        required: false
-        default: "18.x"
+        required: true
       janus-cli-version:
         description: Version of the janus-idp/cli package.
         type: string
-        required: false
-        default: "^1.19.1"
+        required: true        
 
       plugins-repo:
         description:

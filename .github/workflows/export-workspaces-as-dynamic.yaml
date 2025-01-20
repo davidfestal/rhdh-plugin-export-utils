@@ -25,12 +25,6 @@ on:
         required: false
         type: string
 
-      plugins-repo:
-        description: Target Community Plugins repository to export plugins from
-        type: string
-        required: false
-        default: ''
-
       overlay-branch:
         description: Branch of the overlay structure (current branch by default).
         type: string
@@ -52,7 +46,6 @@ jobs:
     outputs:
       node-version: ${{ steps.set-env-vars.outputs.NODE_VERSION }}
       janus-cli-version: ${{ steps.set-env-vars.outputs.JANUS_CLI_VERSION }}
-      plugins-repo: ${{ steps.set-env-vars.outputs.PLUGINS_REPO }}
       workspaces: ${{ steps.gather-workspaces.outputs.workspaces }}
       overlay-repo-ref: ${{ steps.set-overlay-repo-ref.outputs.OVERLAY_REPO_REF }}
 
@@ -79,30 +72,13 @@ jobs:
         id: set-env-vars
         shell: bash {0}
         run: |
-          if [[ "${{  inputs.node-version }}" != "" ]]
-          then
-            echo "NODE_VERSION=${{ inputs.node-version }}" >> $GITHUB_OUTPUT
-          else
-            NODE_VERSION=$(cat node-version 2> /dev/null)
-            NODE_VERSION=${NODE_VERSION:-20.x}
-            echo "NODE_VERSION=$NODE_VERSION" >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{  inputs.janus-cli-version }}" != "" ]]
-          then
-            echo "JANUS_CLI_VERSION=${{ inputs.janus-cli-version }}" >> $GITHUB_OUTPUT
-          else
-            JANUS_CLI_VERSION=$(cat janus-cli-version 2> /dev/null)
-            JANUS_CLI_VERSION=${JANUS_CLI_VERSION:-1.18.0}
-            echo "JANUS_CLI_VERSION=$JANUS_CLI_VERSION" >> $GITHUB_OUTPUT
-          fi
-          if [[ "${{  inputs.plugins-repo }}" != "" ]]
-          then
-            echo "PLUGINS_REPO=${{ inputs.plugins-repo }}" >> $GITHUB_OUTPUT
-          else
-            PLUGINS_REPO=$(cat plugins-repo 2> /dev/null)
-            PLUGINS_REPO=${PLUGINS_REPO:-backstage/community-plugins}
-            echo "PLUGINS_REPO=$PLUGINS_REPO" >> $GITHUB_OUTPUT
-          fi       
+          versions=$(cat versions.json)
+
+          NODE_VERSION=$(echo ${versions} | jq -r "if (\"${{ inputs.node-version }}\" == \"\") then (.node // \"20.x\") else \"${{ inputs.node-version }}\" end")
+          echo "NODE_VERSION=${NODE_VERSION}" >> $GITHUB_OUTPUT
+
+          JANUS_CLI_VERSION=$(echo ${versions} | jq -r "if (\"${{ inputs.janus-cli-version }}\" == \"\") then (.cli // \"^3.0.0\") else \"${{ inputs.janus-cli-version }}\" end")
+          echo "JANUS_CLI_VERSION=$JANUS_CLI_VERSION" >> $GITHUB_OUTPUT
 
       - name: Gather workspaces
         id: gather-workspaces
@@ -126,9 +102,10 @@ jobs:
                 continue
               fi
 
-              if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/plugins-repo-ref" ]]
+              if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/source.json" ]]
               then
-                echo -n "${comma} {\"plugins-root\": \"${d}\", \"plugins-repo-ref\": \"$(cat ${d}/plugins-repo-ref)\"}"
+                workspace=$(jq ". | with_entries(.key = \"plugins-\(.key)\") | . += { \"plugins-root\": \"${d}\"}" source.json)
+                echo -n "${comma} ${workspace}"
                 comma=','
               fi
             done
@@ -147,7 +124,7 @@ jobs:
         workspace: ${{ fromJSON(needs.prepare.outputs.workspaces) }}
 
     with:
-      plugins-repo: ${{ needs.prepare.outputs.plugins-repo }}
+      plugins-repo: ${{ matrix.workspace.plugins-repo }}
       plugins-repo-ref: ${{ matrix.workspace.plugins-repo-ref }}
       plugins-root: ${{ matrix.workspace.plugins-root }}
       overlay-repo: ${{ github.repository }}

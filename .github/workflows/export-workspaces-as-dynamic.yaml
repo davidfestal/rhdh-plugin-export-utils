@@ -105,7 +105,7 @@ jobs:
 
               if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/source.json" ]]
               then
-                workspace=$(jq ". | with_entries(.key = \"plugins-\(.key)\") | . += { \"plugins-root\": \"${d}\"}" ${d}/source.json)
+                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\") | . += { \"plugins-root\": \"${d}\"}" ${d}/source.json)
                 echo -n "${comma} ${workspace}"
                 comma=','
               fi

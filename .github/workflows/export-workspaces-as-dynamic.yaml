@@ -105,7 +105,7 @@ jobs:
 
               if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/source.json" ]]
               then
-                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\") | . += { \"plugins-root\": \"${d}\"}" ${d}/source.json)
+                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\") | . += { \"plugins-root\": (if .\"plugins-repo-flat\" then \".\" else \"${d}\" end)}" ${d}/source.json)
                 echo -n "${comma} ${workspace}"
                 comma=','
               fi
@@ -127,7 +127,7 @@ jobs:
     with:
       plugins-repo: ${{ matrix.workspace.plugins-repo }}
       plugins-repo-ref: ${{ matrix.workspace.plugins-repo-ref }}
-      plugins-root: ${{ matrix.workspace.plugins-root }}
+      plugins-root: ${{ matrix.workspace.plugins-repo-flat ? '.' : matrix.workspace.plugins-root }}
       overlay-repo: ${{ github.repository }}
       overlay-repo-ref: ${{ needs.prepare.outputs.overlay-repo-ref }}
       node-version: ${{ needs.prepare.outputs.node-version }}

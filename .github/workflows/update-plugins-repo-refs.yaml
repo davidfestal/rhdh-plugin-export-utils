@@ -35,6 +35,7 @@ jobs:
         id: get-published-community-plugins
         shell: bash
         run: |
+          set -x
           npm install semver -g
           regexps='${{ inputs.regexps }}'
           plugins=$(          

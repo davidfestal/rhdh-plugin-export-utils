@@ -59,7 +59,7 @@ jobs:
           ref: ${{ inputs.overlay-branch }}
 
       - name: Set overlay_ref
-        id: set-overlay-repo-ref 
+        id: set-overlay-repo-ref
         run: |
           if [[ "${{ inputs.overlay-branch }}" != "" ]]
           then
@@ -104,7 +104,8 @@ jobs:
 
               if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/source.json" ]]
               then
-                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\") | . += { \"plugins-root\": (if .\"plugins-repo-flat\" then \".\" else \"${d}\" end)}" ${d}/source.json)
+                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\" ) | . += { \"plugins-root\": (if .\"plugins-repo-flat\" then \".\" else \"${d}\" end)}" ${d}/source.json)
+                workspace=$(echo "${workspace}" | sed -e 's;https://github.com/;;')
                 echo -n "${comma} ${workspace}"
                 comma=','
               fi

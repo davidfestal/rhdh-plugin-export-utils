@@ -65,7 +65,7 @@ jobs:
                 if [[ "${packageName}" == *"-node" ]] || [[ "${packageName}" == *"-common" ]] || [[ "${packageName}" == *"-react" ]] 
                 then
                   debug "Skipping published package ${packageName}: not a plugin" >&2
-                  continueman npm ;
+                  continue
                 fi
                 npmPackage=$(npm view --json ${package} backstage versions)
                 if [[ "$(echo ${nmpPackage} | jq -r '.backstage.role')" != *"-plugin"* ]]

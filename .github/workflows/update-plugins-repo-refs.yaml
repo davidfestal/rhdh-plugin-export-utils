@@ -96,7 +96,6 @@ jobs:
                   fi
                   gitHead=$(echo ${pluginInfo} | jq -r '.gitHead')
 
-                  set -x
                   backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/workspaces/${workspace}/backstage.json | jq -r '.version')
                   pluginBranch=""
                   while read -r overlayRepoBranch supportedBackstageVersion
@@ -108,7 +107,6 @@ jobs:
                     fi
                   done <<< "$(echo ${supportedBackstageVersions} | jq -r 'to_entries[] | "\(.key) \(.value)"')"
 
-                  echo "Plugin Branch: ${pluginBranch}"
                   if [[ "${pluginBranch}" == "" ]]
                   then 
                     if [[ $oneVersionFound ]]
@@ -121,13 +119,12 @@ jobs:
                     fi
                   fi
 
-                  echo "Plugin ${packageName}@${version} selected for export"
+                  echo "Plugin ${packageName}@${version} selected for export" >&2
                   oneVersionFound=true
                   addedFields="{\"workspace\":\"$workspace\", \"backstageVersion\": \"$backstageVersion\", \"branch\": \"$pluginBranch\", \"repo\": \"$gitRepo\", \"flat\": $flat}"
                   pluginInfo=$(echo "${pluginInfo}" | jq ".+= $addedFields")
                   echo -n "${comma} ${pluginInfo}"
                   comma=','
-                  set +x
                 done
               done
               echo ']'

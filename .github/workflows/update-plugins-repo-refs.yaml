@@ -41,7 +41,6 @@ jobs:
               echo "$1"
             fi
           }
-          set -x
           npm install semver -g
           regexps='${{ inputs.regexps }}'
           overlayRepoBranches=$(curl -s https://api.github.com/repos/${{ inputs.overlay-repo }}/branches  | jq -r '.[].name | select(startswith("${{ inputs.release-branch-prefix }}"))')

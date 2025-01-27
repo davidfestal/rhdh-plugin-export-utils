@@ -166,7 +166,7 @@ jobs:
           fi
 
           plugins=$(cat published-plugins.json)
-          workspaces=$(echo ${plugins} | jq 'group_by(.branch + "__" + .workspace) | map({ (.[0].branch + "__" + .[0].workspace): {"workspace": .[0].workspace, "branch": .[0].branch, "backstageVersion": .[0].backstageVersion, "plugins": (. | group_by(.name) | map(. | sort_by(.version) | last ) )} }) | add')
+          workspaces=$(echo ${plugins} | jq 'group_by(.branch + "__" + .workspace) | map({ (.[0].branch + "__" + .[0].workspace): {"workspace": .[0].workspace, "branch": .[0].branch, "backstageVersion": .[0].backstageVersion, "repo": .[0].repo, "flat": .[0].flat, "plugins": (. | group_by(.name) | map(. | sort_by(.version) | last ) )} }) | add')
 
           echo "Workspaces:"
           echo "$workspaces"

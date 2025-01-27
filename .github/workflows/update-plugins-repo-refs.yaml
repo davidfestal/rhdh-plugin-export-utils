@@ -16,7 +16,14 @@ on:
 
       verbose:
         type: boolean
-        required: true    
+        required: false
+        default: false
+
+      debug:
+        type: boolean
+        required: false
+        default: false
+  
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -40,12 +47,18 @@ jobs:
         run: |
           # Plugin Retrieval
 
-          function debug() {
+          function verbose() {
             if [[ "${{ inputs.verbose }}" == "true" ]]
             then
               echo "$1"
             fi
           }
+
+          if [[ "${{ inputs.verbose }}" == "true" ]]
+          then
+            set -x
+          fi
+          
           npm install semver -g
           regexps='${{ inputs.regexps }}'
           overlayRepoBranches=$(curl -s https://api.github.com/repos/${{ inputs.overlay-repo }}/branches  | jq -r '.[].name | select(startswith("${{ inputs.release-branch-prefix }}"))')
@@ -67,13 +80,13 @@ jobs:
               do
                 if [[ "${packageName}" == *"-node" ]] || [[ "${packageName}" == *"-common" ]] || [[ "${packageName}" == *"-react" ]] 
                 then
-                  debug "  Skipping published package ${packageName}: not a plugin" >&2
+                  verbose "  Skipping published package ${packageName}: not a plugin" >&2
                   continue
                 fi
                 npmPackage=$(npm view --json ${packageName} backstage versions)
                 if [[ "$(echo ${npmPackage} | jq -r '.backstage.role')" != *"-plugin"* ]]
                 then
-                  debug "  Skipping published package ${packageName}: not a plugin" >&2
+                  verbose "  Skipping published package ${packageName}: not a plugin" >&2
                   continue
                 fi
                 oneVersionFound=false
@@ -116,7 +129,7 @@ jobs:
                       echo "    Skipping version ${version} and earlier of published plugin ${packageName}, since the underlying Backstage version ${backstageVersion} is too old for RHDH" >&2
                       break
                     else
-                      debug "      Skipping published plugin ${packageName}@${version}, since the underlying Backstage version ${backstageVersion} is not used by RHDH" >&2
+                      verbose "      Skipping published plugin ${packageName}@${version}, since the underlying Backstage version ${backstageVersion} is not used by RHDH" >&2
                       continue
                     fi
                   fi

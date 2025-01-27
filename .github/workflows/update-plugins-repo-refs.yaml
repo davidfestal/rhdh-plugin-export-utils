@@ -95,9 +95,9 @@ jobs:
                     flat="true"
                   fi
                   gitHead=$(echo ${pluginInfo} | jq -r '.gitHead')
+
                   set -x
                   backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/workspaces/${workspace}/backstage.json | jq -r '.version')
-
                   pluginBranch=""
                   echo "${supportedBackstageVersions}" | jq -r 'to_entries[] | "\(.key) \(.value)"' | while read -r overlayRepoBranch supportedBackstageVersion
                   do
@@ -108,8 +108,9 @@ jobs:
                     fi
                   done
 
+                  echo "Plugin Branch: ${pluginBranch}"
                   if [[ "${pluginBranch}" == "" ]]
-                  then
+                  then 
                     if [[ $oneVersionFound ]]
                     then
                       debug "Skipping published plugin ${packageName}@${version}, since the underlying Backstage version ${backstageVersion} is not used by RHDH" >&2

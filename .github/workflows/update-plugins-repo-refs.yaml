@@ -54,7 +54,7 @@ jobs:
             fi
           }
 
-          if [[ "${{ inputs.verbose }}" == "true" ]]
+          if [[ "${{ inputs.debug }}" == "true" ]]
           then
             set -x
           fi

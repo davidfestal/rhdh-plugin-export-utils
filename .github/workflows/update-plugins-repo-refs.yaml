@@ -262,7 +262,7 @@ jobs:
             const workspaceCommit = '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}';
             const workspaceJson ='${{ steps.get-workspace-json.outputs.workspace }}';
 
-            const script = require('.github/workflows/create-pr-if-necessary.js');
+            const script = require('${{ github.workflow_ref }}/../create-pr-if-necessary.js');
             await script({
               github,
               core,

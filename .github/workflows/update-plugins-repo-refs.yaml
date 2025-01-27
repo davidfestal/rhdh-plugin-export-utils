@@ -41,7 +41,7 @@ jobs:
           # Plugin Retrieval
 
           function debug() {
-            if [[ "$ACTIONS_STEP_DEBUG" == "true" ]]
+            if [[ "${{ inputs.verbose }}" == "true" ]]
             then
               echo "$1"
             fi

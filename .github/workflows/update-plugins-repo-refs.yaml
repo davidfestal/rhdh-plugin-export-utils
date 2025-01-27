@@ -95,6 +95,7 @@ jobs:
                     flat="true"
                   fi
                   gitHead=$(echo ${pluginInfo} | jq -r '.gitHead')
+                  set -x
                   backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/workspaces/${workspace}/backstage.json | jq -r '.version')
 
                   pluginBranch=""
@@ -118,6 +119,7 @@ jobs:
                       break
                     fi
                   fi
+                  set +x
 
                   echo "Plugin ${packageName}@${version} selected for export"
                   oneVersionFound=true

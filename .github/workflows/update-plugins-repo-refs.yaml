@@ -252,7 +252,7 @@ jobs:
           echo "Workspace commit: ${workspaceCommit}"
           echo "workspace-commit=${workspaceCommit}" >> $GITHUB_OUTPUT
           
-          echo "Action repo: ls -RX $GITHUB_ACTION_REPOSITORY"
+          echo "Action repo: $(ls -RX ${{ github.action_path }})"
           
       - name: Create PR if necessary
         id: create-pr-if-necessary

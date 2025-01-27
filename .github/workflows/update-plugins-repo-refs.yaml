@@ -49,13 +49,13 @@ jobs:
           npm install semver -g
           regexps='${{ inputs.regexps }}'
           overlayRepoBranches=$(curl -s https://api.github.com/repos/${{ inputs.overlay-repo }}/branches  | jq -r '.[].name | select(startswith("${{ inputs.release-branch-prefix }}"))')
-          supportedBackstageVersions={}
+          supportedBackstageVersions=()
           for overlayRepoBranch in ${overlayRepoBranches}
           do
             supportedBackstageVersion=$(curl -s https://raw.githubusercontent.com/${{ inputs.overlay-repo }}/${overlayRepoBranch}/versions.json | jq -r '.backstage')
-            supportedBackstageVersions=$(echo "$supportedBackstageVersions" | jq --arg branch "$overlayRepoBranch" --arg version "$supportedBackstageVersion" '. + {($branch): $version}')
+            supportedBackstageVersions+="$supportedBackstageVersion"
           done
-
+          minimalBackstageVersion=$(echo "${supportedBackstageVersions[*]}" | sort -V | head -n1)
           plugins=$(
             comma=""
             echo '['
@@ -98,8 +98,11 @@ jobs:
 
                   backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/workspaces/${workspace}/backstage.json | jq -r '.version')
                   pluginBranch=""
-                  while read -r overlayRepoBranch supportedBackstageVersion
+
+                  for i in ${!overlayRepoBranches[@]}
                   do
+                    overlayRepoBranch=${overlayRepoBranches[$i]}
+                    supportedBackstageVersion=${supportedBackstageVersion[$i]}
                     if [[ "${supportedBackstageVersion}" == "$(semver -r ~${backstageVersion} ${supportedBackstageVersion})" ]]
                     then
                       pluginBranch=${overlayRepoBranch}
@@ -107,17 +110,19 @@ jobs:
                     fi
                   done <<< "$(echo ${supportedBackstageVersions} | jq -r 'to_entries[] | "\(.key) \(.value)"')"
 
+                  set -x
                   if [[ "${pluginBranch}" == "" ]]
-                  then 
-                    if [[ $oneVersionFound ]]
+                  then
+                    if [[ "${backstageVersion} ${minimalBackstageVersion}" == "$(semver ${backstageVersion} ${minimalBackstageVersion})" ]]
                     then
-                      debug "Skipping published plugin ${packageName}@${version}, since the underlying Backstage version ${backstageVersion} is not used by RHDH" >&2
-                      continue
-                    else
                       echo "Skipping version ${version} and earlier of published plugin ${packageName}, since the underlying Backstage version ${backstageVersion} is too old for RHDH" >&2
                       break
+                    else
+                      debug "Skipping published plugin ${packageName}@${version}, since the underlying Backstage version ${backstageVersion} is not used by RHDH" >&2
+                      continue
                     fi
                   fi
+                  set +x
 
                   echo "Plugin ${packageName}@${version} selected for export" >&2
                   oneVersionFound=true

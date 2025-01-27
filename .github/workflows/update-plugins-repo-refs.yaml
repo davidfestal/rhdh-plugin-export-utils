@@ -108,7 +108,7 @@ jobs:
                       pluginBranch=${overlayRepoBranch}
                       break
                     fi
-                  done <<< "$(echo ${supportedBackstageVersions} | jq -r 'to_entries[] | "\(.key) \(.value)"')"
+                  done
 
                   set -x
                   if [[ "${pluginBranch}" == "" ]]

@@ -11,7 +11,7 @@ module.exports = async ({
     const githubClient = github.rest;
         
     const workspace = JSON.parse(workspaceJson);
-    const targetBranchName = `releases/${workspace.branch}`;
+    const targetBranchName = `${workspace.branch}`;
     const workspaceName = workspace.workspace;
     const [pluginsRepoOwner, pluginsRepo] = workspace.repo.plit('/');
     const pluginRepoUrl = `https://github.com/${workspace.repo}`;

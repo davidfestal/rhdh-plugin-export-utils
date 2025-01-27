@@ -160,14 +160,19 @@ jobs:
         id: gather-workspaces
         shell: bash
         run: |
-            plugins=$(cat published-plugins.json)
-            workspaces=$(echo ${plugins} | jq 'group_by(.branch + "__" + .workspace) | map({ (.[0].branch + "__" + .[0].workspace): {"workspace": .[0].workspace, "branch": .[0].branch, "backstageVersion": .[0].backstageVersion, "plugins": (. | group_by(.name) | map(. | sort_by(.version) | last ) )} }) | add')
-  
-            echo "Workspaces:"
-            echo "$workspaces"
-  
-            echo "$workspaces" | jq -c > workspaces.json
-            echo "workspace-keys=$(echo $workspaces | jq -c keys)" >> $GITHUB_OUTPUT
+          if [[ "${{ inputs.debug }}" == "true" ]]
+          then
+            set -x
+          fi
+
+          plugins=$(cat published-plugins.json)
+          workspaces=$(echo ${plugins} | jq 'group_by(.branch + "__" + .workspace) | map({ (.[0].branch + "__" + .[0].workspace): {"workspace": .[0].workspace, "branch": .[0].branch, "backstageVersion": .[0].backstageVersion, "plugins": (. | group_by(.name) | map(. | sort_by(.version) | last ) )} }) | add')
+
+          echo "Workspaces:"
+          echo "$workspaces"
+
+          echo "$workspaces" | jq -c > workspaces.json
+          echo "workspace-keys=$(echo $workspaces | jq -c keys)" >> $GITHUB_OUTPUT
 
       - name: Upload workspaces json file
         uses: actions/upload-artifact@v4
@@ -208,6 +213,11 @@ jobs:
         id: get-workspace-commit-id
         shell: bash
         run: |
+          if [[ "${{ inputs.debug }}" == "true" ]]
+          then
+            set -x
+          fi
+          
           workspace='${{ steps.get-workspace-json.outputs.workspace }}'          
           repository=$(echo "$workspace" | jq -r 'repo')
           commits=$(echo "$workspace" | jq -r '[ .plugins[] | .gitHead ] | unique | .[]')

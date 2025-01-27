@@ -14,6 +14,9 @@ on:
         type: string
         required: true
 
+      verbose:
+        type: boolean
+        required: true    
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -116,6 +119,7 @@ jobs:
                     fi
                   fi
 
+                  echo "Plugin ${packageName}@${version} selected for export"
                   oneVersionFound=true
                   addedFields="{\"workspace\":\"$workspace\", \"backstageVersion\": \"$backstageVersion\", \"branch\": \"$pluginBranch\", \"repo\": \"$gitRepo\", \"flat\": $flat}"
                   pluginInfo=$(echo "${pluginInfo}" | jq ".+= $addedFields")

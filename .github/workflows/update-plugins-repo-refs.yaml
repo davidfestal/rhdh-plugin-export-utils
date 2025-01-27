@@ -120,7 +120,6 @@ jobs:
                       break
                     fi
                   fi
-                  set +x
 
                   echo "Plugin ${packageName}@${version} selected for export"
                   oneVersionFound=true
@@ -128,6 +127,7 @@ jobs:
                   pluginInfo=$(echo "${pluginInfo}" | jq ".+= $addedFields")
                   echo -n "${comma} ${pluginInfo}"
                   comma=','
+                  set +x
                 done
               done
               echo ']'

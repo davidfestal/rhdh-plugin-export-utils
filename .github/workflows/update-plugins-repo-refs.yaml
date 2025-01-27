@@ -95,7 +95,7 @@ jobs:
                   backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/workspaces/${workspace}/backstage.json | jq -r '.version')
 
                   pluginBranch=""
-                  echo "${supportedBackstageVersions} | jq -r 'to_entries[] | "\(.key) \(.value)"' | while read -r overlayRepoBranch supportedBackstageVersion
+                  echo "${supportedBackstageVersions}" | jq -r 'to_entries[] | "\(.key) \(.value)"' | while read -r overlayRepoBranch supportedBackstageVersion
                   do
                     if [[ "${supportedBackstageVersion}" == "$(semver -r ~${backstageVersion} ${supportedBackstageVersion})" ]]
                     then

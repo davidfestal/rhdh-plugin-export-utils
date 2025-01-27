@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           # Plugin Retrieval
-          
+
           function debug() {
             if [[ "$ACTIONS_STEP_DEBUG" == "true" ]]
             then
@@ -95,7 +95,7 @@ jobs:
                   backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/workspaces/${workspace}/backstage.json | jq -r '.version')
 
                   pluginBranch=""
-                  echo "${supportedBackstageVersions} | js -r 'to_entries[] | "\(.key) \(.value)"' | while read -r overlayRepoBranch supportedBackstageVersion
+                  echo "${supportedBackstageVersions} | jq -r 'to_entries[] | "\(.key) \(.value)"' | while read -r overlayRepoBranch supportedBackstageVersion
                   do
                     if [[ "${supportedBackstageVersion}" == "$(semver -r ~${backstageVersion} ${supportedBackstageVersion})" ]]
                     then

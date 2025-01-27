@@ -113,7 +113,7 @@ jobs:
                   set -x
                   if [[ "${pluginBranch}" == "" ]]
                   then
-                    if [[ "${backstageVersion} ${minimalBackstageVersion}" == "$(semver ${backstageVersion} ${minimalBackstageVersion})" ]]
+                    if [[ "${backstageVersion} ${minimalBackstageVersion}" == "$(echo $(semver ${backstageVersion} ${minimalBackstageVersion}))" ]]
                     then
                       echo "Skipping version ${version} and earlier of published plugin ${packageName}, since the underlying Backstage version ${backstageVersion} is too old for RHDH" >&2
                       break

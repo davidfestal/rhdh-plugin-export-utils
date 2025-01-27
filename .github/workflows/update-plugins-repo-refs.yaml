@@ -35,6 +35,8 @@ jobs:
         id: get-published-community-plugins
         shell: bash
         run: |
+          # Plugin Retrieval
+          
           function debug() {
             if [[ "$ACTIONS_STEP_DEBUG" == "true" ]]
             then
@@ -48,7 +50,7 @@ jobs:
           for overlayRepoBranch in ${overlayRepoBranches}
           do
             supportedBackstageVersion=$(curl -s https://raw.githubusercontent.com/${{ inputs.overlay-repo }}/${overlayRepoBranch}/versions.json | jq -r '.backstage')
-            $supportedBackstageVersions=$(echo "$supportedBackstageVersions" | jq --arg branch "$overlayRepoBranch" --arg version "$supportedBackstageVersion" '. + {($branch): $version}')
+            supportedBackstageVersions=$(echo "$supportedBackstageVersions" | jq --arg branch "$overlayRepoBranch" --arg version "$supportedBackstageVersion" '. + {($branch): $version}')
           done
 
           plugins=$(          

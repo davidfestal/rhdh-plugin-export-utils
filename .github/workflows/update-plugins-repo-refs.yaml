@@ -219,7 +219,7 @@ jobs:
           fi
           
           workspace='${{ steps.get-workspace-json.outputs.workspace }}'          
-          repository=$(echo "$workspace" | jq -r 'repo')
+          repository=$(echo "$workspace" | jq -r '.repo')
           commits=$(echo "$workspace" | jq -r '[ .plugins[] | .gitHead ] | unique | .[]')
           pluginDirectories=$(echo '${{ steps.get-workspace-json.outputs.workspace }}' | jq -r '.plugins[] | .directory')
           if [[ $(echo ${commits} | wc -w) == 1 ]]

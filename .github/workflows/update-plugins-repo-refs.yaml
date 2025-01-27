@@ -107,6 +107,10 @@ jobs:
                   then
                     workspace=$(echo ${gitRepo} | sed 's:.*/\([^/]*\)$:\1:')
                     backstageJsonPath="backstage.json"
+                    if [[ "${gitRepo}" == "backstage/backstage" ]]
+                    then
+                      backstageJsonPath="package.json"
+                    fi                   
                     flat="true"
                   fi
                   gitHead=$(echo ${pluginInfo} | jq -r '.gitHead')

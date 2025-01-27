@@ -72,7 +72,7 @@ jobs:
                   continue
                 fi
                 npmPackage=$(npm view --json ${packageName} backstage versions)
-                if [[ "$(echo ${nmpPackage} | jq -r '.backstage.role')" != *"-plugin"* ]]
+                if [[ "$(echo ${npmPackage} | jq -r '.backstage.role')" != *"-plugin"* ]]
                 then
                   debug "Skipping published package ${packageName}: not a plugin" >&2
                   continue

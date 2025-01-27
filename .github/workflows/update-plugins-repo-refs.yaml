@@ -102,14 +102,16 @@ jobs:
                   fi
                   flat="false"
                   workspace=$(echo ${pluginInfo} | jq -r '.directory | if (. | startswith("workspaces/")) then (. | sub("workspaces/(?<name>[^/]*)/plugins/.*"; "\(.name)")) else "" end')
+                  backstageJsonPath="workspaces/${workspace}/backstage.json"
                   if [[ "${workspace}" == "" ]]
                   then
                     workspace=$(echo ${gitRepo} | sed 's:.*/\([^/]*\)$:\1:')
+                    backstageJsonPath="backstage.json"
                     flat="true"
                   fi
                   gitHead=$(echo ${pluginInfo} | jq -r '.gitHead')
 
-                  backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/workspaces/${workspace}/backstage.json | jq -r '.version')
+                  backstageVersion=$(curl -s https://raw.githubusercontent.com/${gitRepo}/${gitHead}/${backstageJsonPath} | jq -r '.version')
                   pluginBranch=""
                   for i in ${!overlayRepoBranches[@]}
                   do

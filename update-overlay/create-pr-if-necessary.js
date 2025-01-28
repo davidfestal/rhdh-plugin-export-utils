@@ -10,7 +10,6 @@ module.exports = async ({
   workspaceCommit,
   pluginsRepoOwner,
   pluginsRepoName,
-  pluginsRepoUrl,
   pluginsRepoFlat,
   pluginDirectories,
 }) => {

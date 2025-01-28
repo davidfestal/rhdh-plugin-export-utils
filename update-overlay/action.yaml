@@ -53,13 +53,13 @@ runs:
             core,
             overlayRepoOwner,
             overlayRepoName,
-            '${{ inputs.overlay-repo-branch-name }}',
-            '${{ inputs.target-pr-branch-name }}',
-            '${{ inputs.backstage-version }}',
-            '${{ inputs.workspace-name }}',
-            '${{ inputs.workspace-commit }}',
+            overlyRepoBranchName: '${{ inputs.overlay-repo-branch-name }}',
+            targetPRBranchName: '${{ inputs.target-pr-branch-name }}',
+            backstageVersion: '${{ inputs.backstage-version }}',
+            workspaceName: '${{ inputs.workspace-name }}',
+            workspaceCommit: '${{ inputs.workspace-commit }}',
             pluginsRepoOwner,
             pluginsRepoName,
-            '${{ inputs.plugins-repo-flat }},
-            '${{ inputs.plugin-directories }}'
+            pluginsRepoFlat: '${{ inputs.plugins-repo-flat }},
+            pluginDirectories: '${{ inputs.plugin-directories }}'
           });

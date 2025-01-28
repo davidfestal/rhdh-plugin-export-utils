@@ -45,13 +45,9 @@ runs:
       uses: actions/github-script@v7
       with:
         script: |
-          console.log("start !!!");
           const [overlayRepoOwner, overlayRepoName] = '${{ inputs.overlay-repo }}'.split('/');
           const [pluginsRepoOwner, pluginsRepoName] = '${{ inputs.plugins-repo }}'.split('/');
-          console.log("before require");
           const script = require('${{ github.action_path }}/create-pr-if-necessary.js');
-          /*          
-          console.log("before running script");
           await script({
             github,
             core,
@@ -67,4 +63,3 @@ runs:
             '${{ inputs.plugins-repo-flat }}',
             '${{ inputs.plugin-directories }}',
           });
-          */

@@ -269,6 +269,7 @@ jobs:
               "plugins-repo-flat": workspace.flat,
               "plugin-directories": workspace.plugins.map((plugin) => plugin.directory).join('\n')
             };
+            console.log(result);
             return result;
             
 

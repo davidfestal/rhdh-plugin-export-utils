@@ -49,7 +49,7 @@ runs:
           const [overlayRepoOwner, overlayRepoName] = '${{ inputs.overlay-repo }}'.split('/');
           const [pluginsRepoOwner, pluginsRepoName] = '${{ inputs.plugins-repo }}'.split('/');
           console.log("before require");
-          const script = require('./create-pr-if-necessary.js');
+          const script = require('${{ github.action_path }}/create-pr-if-necessary.js');
           /*          
           console.log("before running script");
           await script({

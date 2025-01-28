@@ -269,9 +269,9 @@ jobs:
               "plugins-repo-flat": workspace.flat,
               "plugin-directories": workspace.plugins.map((plugin) => plugin.directory).join('\n')
             };
+            core.setOutput('overlay-repo-branch-name', workspace.branch);
             console.log(result);
             return result;
-            
 
       - name: Create PR if necessary
         id: create-pr-if-necessary

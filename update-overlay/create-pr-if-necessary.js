@@ -13,7 +13,8 @@ module.exports = async ({
   pluginsRepoFlat,
   pluginDirectories,
 }) => {
-  try {    
+  try {
+    console.log('In the method !!!!');
     const githubClient = github.rest;
     
     const workspacePath = `workspaces/${workspaceName}`;

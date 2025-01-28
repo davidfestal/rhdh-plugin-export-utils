@@ -260,8 +260,8 @@ jobs:
             const workspaceJson ='${{ steps.get-workspace-json.outputs.workspace }}';
             const workspace = JSON.parse(workspaceJson);
             core.setOutput('overlay-repo-branch-name', workspace.branch);
-            /* 
             core.setOutput('target-pr-branch-name', 'workspaces/${{ matrix.workspace }}');
+            /*
             core.setOutput('backstage-version, workspace.backstageVersion);
             core.setOutput('workspace-name, workspace.workspace);
             core.setOutput('workspace-commit', '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}');

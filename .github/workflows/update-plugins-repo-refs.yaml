@@ -262,7 +262,7 @@ jobs:
             core.setOutput('overlay-repo-branch-name', workspace.branch);
             core.setOutput('target-pr-branch-name', 'workspaces/${{ matrix.workspace }}');
             core.setOutput('backstage-version', workspace.backstageVersion);
-            core.setOutput('workspace-name, workspace.workspace);
+            core.setOutput('workspace-name', workspace.workspace);
             core.setOutput('workspace-commit', '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}');
             core.setOutput('plugins-repo', workspace.repo);
             core.setOutput('plugins-repo-flat', workspace.flat);

@@ -259,14 +259,16 @@ jobs:
           script: |
             const workspaceJson ='${{ steps.get-workspace-json.outputs.workspace }}';
             const workspace = JSON.parse(workspaceJson);
-            core.setOutput('overlay-repo-branch-name', workspace.branch);
-            core.setOutput('target-pr-branch-name', 'workspaces/${{ matrix.workspace }}');
-            core.setOutput('backstage-version = workspace.backstageVersion;
-            core.setOutput('workspace-name, workspace.workspace);
-            core.setOutput('workspace-commit', '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}');
-            core.setOutput('plugins-repo', workspace.repo);
-            core.setOutput('plugins-repo-flat', workspace.flat);
-            core.setOutput('plugin-directories', workspace.plugins.map((plugin) => plugin.directory).join('\n'));        
+            return {
+              'overlay-repo-branch-name': workspace.branch,
+              'target-pr-branch-name': 'workspaces/${{ matrix.workspace }}',
+              'backstage-version': workspace.backstageVersion,
+              'workspace-name': workspace.workspace,
+              'workspace-commit': '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}',
+              'plugins-repo': workspace.repo,
+              'plugins-repo-flat': workspace.flat,
+              'plugin-directories': workspace.plugins.map((plugin) => plugin.directory).join('\n')
+            }
 
       - name: Create PR if necessary
         id: create-pr-if-necessary

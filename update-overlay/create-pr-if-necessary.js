@@ -1,45 +1,47 @@
 module.exports = async ({
   github,
   core,
-  owner,
-  repo,
-  prBranchName,
+  overlayRepoOwner,
+  overlayRepoName,
+  overlayRepoBranchName,
+  targetPRBranchName,
+  backstageVersion,
+  workspaceName,
   workspaceCommit,
-  workspaceJson,
+  pluginsRepoOwner,
+  pluginsRepoName,
+  pluginsRepoUrl,
+  pluginsRepoFlat,
+  pluginDirectories,
 }) => {
   try {    
     const githubClient = github.rest;
-        
-    const workspace = JSON.parse(workspaceJson);
-    const targetBranchName = workspace.branch;
-    const workspaceName = workspace.workspace;
-    const [pluginsRepoOwner, pluginsRepo] = workspace.repo.plit('/');
-    const pluginRepoUrl = `https://github.com/${workspace.repo}`;
-    const flatPluginsRepo = workspace.flat;
-
+    
     const workspacePath = `workspaces/${workspaceName}`;
-    const pluginsYamlContent = workspace.plugins.map((plugin) => `${ plugin.directory.replace(workspacePath + '/', '') }:`).join('\n');
+    const pluginsRepoUrl = `https://github.com/${pluginRepoOwner}/${pluginRepoName}`;
+
+    const pluginsYamlContent = pluginDirectories.replace(new RegExp(`^${workspacePath}/`, 'mg'));
     const sourceJsonContent = JSON.stringify({
-      repo: pluginRepoUrl,
+      repo: pluginsRepoUrl,
       "repo-ref": workspaceCommit,
-      flat: flatPluginsRepo,
+      flat: pluginsRepoFlat,
     });
 
-    const workspaceLink = flatPluginsRepo ?
-      `/${pluginsRepoOwner}/${pluginsRepo}/tree/${workspaceCommit}`
-      : `/${pluginsRepoOwner}/${pluginsRepo}/tree/${workspaceCommit}/workspaces/${workspaceName}`;
+    const workspaceLink = pluginsRepoFlat ?
+      `/${pluginsRepoOwner}/${pluginsRepoName}/tree/${workspaceCommit}`
+      : `/${pluginsRepoOwner}/${pluginsRepoName}/tree/${workspaceCommit}/workspaces/${workspaceName}`;
 
     // checking existing content on the target branch
     let needsUpdate = false;
     try {
       const checkExistingResponse = await githubClient.repos.getContent({
-        owner,
-        repo,
+        owner: overlayRepoOwner,
+        repo: overlayRepoName,
         mediaType: {
           format: 'text'        
         }, 
         path: `${workspacePath}/source.json`,
-        ref: targetBranchName,
+        ref: overlayRepoBranchName,
       })
 
       if (checkExistingResponse.status === 200) {
@@ -49,15 +51,15 @@ module.exports = async ({
           const content = Buffer.from(data.content, 'base64').toString();
           const sourceInfo = JSON.parse(content); 
           if (sourceInfo['repo-ref'] === workspaceCommit.trim() &&
-              sourceInfo['repo'] === pluginRepoUrl &&
-              sourceInfo['flat'] === flatPluginsRepo
+              sourceInfo['repo'] === pluginsRepoUrl &&
+              sourceInfo['flat'] === pluginsRepoFlat
             ) {
             console.log('workspace already added with the same commit');
             await core.summary
               .addHeading('Workspace skipped')
               .addRaw('Workspace ')
               .addLink(workspaceName, workspaceLink)
-              .addRaw(` already exists on branch ${targetBranchName} with the same commit ${workspaceCommit.substring(0,7)}`)
+              .addRaw(` already exists on branch ${overlayRepoBranchName} with the same commit ${workspaceCommit.substring(0,7)}`)
               .write()
             return;
           }
@@ -66,7 +68,7 @@ module.exports = async ({
       }
     } catch(e) {
       if (e instanceof Object && 'status' in e && e.status === 404) {
-        console.log(`workspace ${workspaceName} not found on branch ${targetBranchName}`)
+        console.log(`workspace ${workspaceName} not found on branch ${overlayRepoBranchName}`)
       } else {
         throw e;
       }
@@ -75,22 +77,22 @@ module.exports = async ({
     // Checking pull request existence
     try {
       const prCheckResponse = await githubClient.git.getRef({
-        owner,
-        repo,
-        ref: `heads/${prBranchName}`
+        owner: overlayRepoOwner,
+        repo: overlayRepoName,
+        ref: `heads/${targetPRBranchName}`
       })
 
       if (prCheckResponse.status === 200) {
         console.log('pull request branch already exists. Do not try to create it again.')
         await core.summary
           .addHeading('Workspace skipped')
-          .addRaw(`Pull request branch ${prBranchName} already exists.`, true)
+          .addRaw(`Pull request branch ${targetPRBranchName} already exists.`, true)
           .write();
         return;
       }
     } catch(e) {
       if (e instanceof Object && 'status' in e && e.status === 404) {
-        console.log(`pull request branch ${prBranchName} doesn't already exist.`)
+        console.log(`pull request branch ${targetPRBranchName} doesn't already exist.`)
       } else {
         throw e;
       }
@@ -98,9 +100,9 @@ module.exports = async ({
 
     // getting latest commit sha and treeSha of the target branch
     const response = await githubClient.repos.listCommits({
-      owner,
-      repo,
-      sha: targetBranchName,
+      owner: overlayRepoOwner,
+      repo: overlayRepoName,
+      sha: overlayRepoBranchName,
       per_page: 1,
     })
 
@@ -108,8 +110,8 @@ module.exports = async ({
     const treeSha = response.data[0].commit.tree.sha;
 
     const treeResponse = await githubClient.git.createTree({
-      owner,
-      repo,
+      owner: overlayRepoOwner,
+      repo: overlayRepoName,
       base_tree: treeSha,
       tree: [
         { path: `${workspacePath}/plugins-list.yaml`, mode: '100644', content: pluginsYamlContent },
@@ -119,12 +121,12 @@ module.exports = async ({
     const newTreeSha = treeResponse.data.sha
 
     const needsUpdateMessage = needsUpdate ? 'Update' : 'Add';
-    const message = `${needsUpdateMessage} \`${workspaceName}\` workspace to commit \`${workspaceCommit.substring(0,7)}\` for backstage \`${workspace.backstageVersion}\` on branch \`${targetBranchName}\``
+    const message = `${needsUpdateMessage} \`${workspaceName}\` workspace to commit \`${workspaceCommit.substring(0,7)}\` for backstage \`${backstageVersion}\` on branch \`${overlayRepoBranchName}\``
 
     console.log('creating commit')
     const commitResponse = await githubClient.git.createCommit({
-      owner,
-      repo,
+      owner: overlayRepoOwner,
+      repo: overlayRepoName,
       message,
       tree: newTreeSha,
       parents: [latestCommitSha],
@@ -133,20 +135,20 @@ module.exports = async ({
 
     // Creating branch
     await githubClient.git.createRef({
-      owner,
-      repo,
+      owner: overlayRepoOwner,
+      repo: overlayRepoName,
       sha: newCommitSha,
-      ref: `refs/heads/${prBranchName}`
+      ref: `refs/heads/${targetPRBranchName}`
     })
 
     // Creating pull request
     const prResponse = await githubClient.pulls.create({
-      owner: owner,
-      repo: repo,
-      head: prBranchName,
-      base: targetBranchName,
+      owner: overlayRepoOwner,
+      repo: overlayRepoName,
+      head: targetPRBranchName,
+      base: overlayRepoBranchName,
       title: message,
-      body: `${needsUpdateMessage} [${workspaceName}](${workspaceLink}) workspace at commit ${pluginsRepoOwner}/${pluginsRepo}@${workspaceCommit} for backstage \`${workspace.backstageVersion}\` on branch \`${targetBranchName}\`.
+      body: `${needsUpdateMessage} [${workspaceName}](${workspaceLink}) workspace at commit ${pluginsRepoOwner}/${pluginsRepoName}@${workspaceCommit} for backstage \`${backstageVersion}\` on branch \`${overlayRepoBranchName}\`.
 
   This PR was created automatically.
   You might need to complete it with additional dynamic plugin export information, like:
@@ -161,10 +163,10 @@ module.exports = async ({
     await core.summary
     .addHeading('Workspace PR created')
     .addLink('Pull request', prResponse.data.html_url)
-    .addRaw(` on branch ${targetBranchName}`)
+    .addRaw(` on branch ${overlayRepoBranchName}`)
     .addRaw(' created for workspace ')
     .addLink(workspaceName, workspaceLink)
-    .addRaw(` at commit ${workspaceCommit.substring(0,7)} for backstage ${workspace.backstageVersion}`)
+    .addRaw(` at commit ${workspaceCommit.substring(0,7)} for backstage ${backstageVersion}`)
     .write();
   } catch (error) {
     // Fail the workflow run if an error occurs

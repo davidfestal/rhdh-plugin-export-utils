@@ -181,7 +181,7 @@ jobs:
           path: workspaces.json
               
   export:
-    name: Export
+    name: Update
 
     needs: prepare
     runs-on: ubuntu-latest
@@ -252,25 +252,33 @@ jobs:
           echo "Workspace commit: ${workspaceCommit}"
           echo "workspace-commit=${workspaceCommit}" >> $GITHUB_OUTPUT
           
-          echo "Action repo: $(ls -RX ${{ github.action_path }})"
-          
-      - name: Create PR if necessary
-        id: create-pr-if-necessary
-        uses: actions/github-script@v7
+      - name: Prepare to create PR if necessary
+        id: prepare
+        uses: actions/github-script@v7        
         with:
           script: |
-            const [owner, repo] = '${{ inputs.overlay-repo }}'.split('/');
-            const prBranchName = 'workspaces/${{ matrix.workspace }}';
-            const workspaceCommit = '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}';
             const workspaceJson ='${{ steps.get-workspace-json.outputs.workspace }}';
+            const workspace = JSON.parse(workspaceJson);
+            core.setOutput('overlay-repo-branch-name', workspace.branch);
+            core.setOutput('target-pr-branch-name', 'workspaces/${{ matrix.workspace }}');
+            core.setOutput('backstage-version = workspace.backstageVersion;
+            core.setOutput('workspace-name, workspace.workspace);
+            core.setOutput('workspace-commit', '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}');
+            core.setOutput('plugins-repo', workspace.repo);
+            core.setOutput('plugins-repo-flat', workspace.flat);
+            core.setOutput('plugin-directories', workspace.plugins.map((plugin) => plugin.directory).join('\n'));        
 
-            const script = require('${{ github.workflow_ref }}/../create-pr-if-necessary.js');
-            await script({
-              github,
-              core,
-              owner,
-              repo,
-              prBranchName,
-              workspaceCommit,
-              workspaceJson,
-            });
+      - name: Create PR if necessary
+        id: create-pr-if-necessary
+        uses: davidfestal/rhdh-plugin-export-utils/update-overlay@multi-plugins-repo
+        with:
+          overlay-repo: ${{ inputs.overlay-repo }}
+          overlay-repo-branch-name: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          target-pr-branch-name: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          backstage-version: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          workspace-name: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          workspace-commit: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          plugins-repo: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          plugins-repo-flat: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          plugin-directories: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+    

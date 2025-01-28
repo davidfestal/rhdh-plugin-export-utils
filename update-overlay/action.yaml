@@ -1,0 +1,65 @@
+name: Update dynamic plugin overlays
+description: Updates an overlay repository structure for a workspace through a PR
+inputs:
+  overlay-repo:
+    description: ""
+    required: true
+
+  overlay-repo-branch-name:
+    description: ""
+    required: true
+
+  target-pr-branch-name:
+    description: ""
+    required: true
+
+  backstage-version:
+    description: ""
+    required: true
+
+  workspace-name:
+    description: ""
+    required: true
+
+  workspace-commit:
+    description: ""
+    required: true
+
+  plugins-repo:
+    description: ""
+    required: true
+
+  plugins-repo-flat:
+    description: ""
+    required: true
+
+  plugin-directories:
+    description: ""
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create PR if necessary
+      id: create-pr-if-necessary
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const [overlayRepoOwner, overlayRepoName] = '${{ inputs.overlay-repo }}'.split('/');
+          const [pluginsRepoOwner, pluginsRepoName] = '${{ inputs.plugins-repo }}'.split('/');
+          const script = require('./create-pr-if-necessary.js');
+          await script({
+            github,
+            core,
+            overlayRepoOwner,
+            overlayRepoName,
+            '${{ inputs.overlay-repo-branch-name }}',
+            '${{ inputs.target-pr-branch-name }}',
+            '${{ inputs.backstage-version }}',
+            '${{ inputs.workspace-name }}',
+            '${{ inputs.workspace-commit }}',
+            pluginsRepoOwner,
+            pluginsRepoName,
+            '${{ inputs.plugins-repo-flat }}',
+            '${{ inputs.plugin-directories }}',
+          });

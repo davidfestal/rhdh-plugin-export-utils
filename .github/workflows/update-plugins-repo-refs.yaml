@@ -275,12 +275,12 @@ jobs:
         uses: davidfestal/rhdh-plugin-export-utils/update-overlay@multi-plugins-repo
         with:
           overlay-repo: ${{ inputs.overlay-repo }}
-          overlay-repo-branch-name: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
-          target-pr-branch-name: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
-          backstage-version: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
-          workspace-name: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
-          workspace-commit: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
-          plugins-repo: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
-          plugins-repo-flat: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
-          plugin-directories: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          overlay-repo-branch-name: ${{ steps.prepare.outputs.result.overlay-repo-branch-name }}
+          target-pr-branch-name: ${{ steps.prepare.outputs.result.target-pr-branch-name }}
+          backstage-version: ${{ steps.prepare.outputs.result.backstage-version }}
+          workspace-name: ${{ steps.prepare.outputs.result.workspace-name }}
+          workspace-commit: ${{ steps.prepare.outputs.result.workspace-commit }}
+          plugins-repo: ${{ steps.prepare.outputs.result.plugins-repo }}
+          plugins-repo-flat: ${{ steps.prepare.outputs.result.plugins-repo-flat }}
+          plugin-directories: ${{ steps.prepare.outputs.result.plugin-directories }}
     

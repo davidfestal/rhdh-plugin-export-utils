@@ -259,31 +259,28 @@ jobs:
           script: |
             const workspaceJson ='${{ steps.get-workspace-json.outputs.workspace }}';
             const workspace = JSON.parse(workspaceJson);
-            const result = {
-              "overlay-repo-branch-name": workspace.branch,
-              "target-pr-branch-name": 'workspaces/${{ matrix.workspace }}',
-              "backstage-version": workspace.backstageVersion,
-              "workspace-name": workspace.workspace,
-              "workspace-commit": '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}',
-              "plugins-repo": workspace.repo,
-              "plugins-repo-flat": workspace.flat,
-              "plugin-directories": workspace.plugins.map((plugin) => plugin.directory).join('\n')
-            };
             core.setOutput('overlay-repo-branch-name', workspace.branch);
-            console.log(result);
-            return result;
+            core.setOutput('target-pr-branch-name', 'workspaces/${{ matrix.workspace }}');
+            core.setOutput('backstage-version = workspace.backstageVersion;
+            core.setOutput('workspace-name, workspace.workspace);
+            core.setOutput('workspace-commit', '${{ steps.get-workspace-commit-id.outputs.workspace-commit }}');
+            core.setOutput('plugins-repo', workspace.repo);
+            core.setOutput('plugins-repo-flat', workspace.flat);
+            core.setOutput('plugin-directories', workspace.plugins.map((plugin) => plugin.directory).join('\n'));
+            
+            return {};
 
       - name: Create PR if necessary
         id: create-pr-if-necessary
         uses: davidfestal/rhdh-plugin-export-utils/update-overlay@multi-plugins-repo
         with:
-          overlay-repo: '${{ inputs.overlay-repo }}'
-          overlay-repo-branch-name: '${{ steps.prepare.outputs.overlay-repo-branch-name }}'
-          target-pr-branch-name: '${{ steps.prepare.outputs.result.target-pr-branch-name }}'
-          backstage-version: '${{ steps.prepare.outputs.result.backstage-version }}'
-          workspace-name: '${{ steps.prepare.outputs.result.workspace-name }}'
-          workspace-commit: '${{ steps.prepare.outputs.result.workspace-commit }}'
-          plugins-repo: '${{ steps.prepare.outputs.result.plugins-repo }}'
-          plugins-repo-flat: '${{ steps.prepare.outputs.result.plugins-repo-flat }}'
-          plugin-directories: '${{ steps.prepare.outputs.result.plugin-directories }}'
+          overlay-repo: ${{ inputs.overlay-repo }}
+          overlay-repo-branch-name: ${{ steps.prepare.outputs.overlay-repo-branch-name }}
+          target-pr-branch-name: ${{ steps.prepare.outputs.target-pr-branch-name }}
+          backstage-version: ${{ steps.prepare.outputs.backstage-version }}
+          workspace-name: ${{ steps.prepare.outputs.workspace-name }}
+          workspace-commit: ${{ steps.prepare.outputs.workspace-commit }}
+          plugins-repo: ${{ steps.prepare.outputs.plugins-repo }}
+          plugins-repo-flat: ${{ steps.prepare.outputs.plugins-repo-flat }}
+          plugin-directories: ${{ steps.prepare.outputs.plugin-directories }}
     

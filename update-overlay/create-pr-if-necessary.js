@@ -17,7 +17,7 @@ module.exports = async ({
     const githubClient = github.rest;
     
     const workspacePath = `workspaces/${workspaceName}`;
-    const pluginsRepoUrl = `https://github.com/${pluginRepoOwner}/${pluginRepoName}`;
+    const pluginsRepoUrl = `https://github.com/${pluginsRepoOwner}/${pluginsRepoName}`;
 
     const pluginsYamlContent = pluginDirectories.replace(new RegExp(`^${workspacePath}/`, 'mg'));
     const sourceJsonContent = JSON.stringify({

@@ -43,7 +43,13 @@ on:
           dynamic, as well as optional export directives and source overlays.
         type: string
         required: true
-
+      overlay-root:
+        description:
+          Relative path of the folder containing the plugins.yaml file, inisde the overlay repository.
+        required: false
+        type: string
+        default: "."
+  
       publish-container:
         description: Publish a container image for the dynamic plugins
         type: boolean
@@ -162,7 +168,7 @@ jobs:
         uses: redhat-developer/rhdh-plugin-export-utils/export-dynamic@main
         with:
           plugins-root: ${{inputs.plugins-root}}
-          plugins-file: ${{ github.workspace }}/overlay-repo/${{inputs.plugins-root}}/plugins-list.yaml
+          plugins-file: ${{ github.workspace }}/overlay-repo/${{inputs.overlay-root}}/plugins-list.yaml
           destination: ${{ github.workspace }}/dynamic-plugin-archives
           janus-cli-version: ${{inputs.janus-cli-version}}
           base-image-tag-name: ${{ steps.set-image-tag-name.outputs.BASE_IMAGE_TAG_NAME }}
@@ -172,9 +178,9 @@ jobs:
         shell: bash
         run: |
           ARTIFACTS_NAME_SUFFIX=""
-          if [[ "${{  inputs.plugins-root }}" != "." ]]
+          if [[ "${{  inputs.overlay-root }}" != "." ]]
           then
-            ARTIFACTS_NAME_SUFFIX=" ($(echo '${{  inputs.plugins-root }}' | sed -e 's:/:-:g'))"
+            ARTIFACTS_NAME_SUFFIX=" ($(echo '${{  inputs.overlay-root }}' | sed -e 's:/:-:g'))"
           fi
           echo "ARTIFACTS_NAME_SUFFIX=$ARTIFACTS_NAME_SUFFIX" >> $GITHUB_OUTPUT
 

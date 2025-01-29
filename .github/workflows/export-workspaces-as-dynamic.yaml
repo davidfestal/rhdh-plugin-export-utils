@@ -104,7 +104,7 @@ jobs:
 
               if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/source.json" ]]
               then
-                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\" ) | . += { \"plugins-root\": (if .\"plugins-repo-flat\" then \".\" else \"${d}\" end)}" ${d}/source.json)
+                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\" ) | . += { \"overlay-root\”: \"${d}\", \"plugins-root\": (if .\"plugins-repo-flat\" then \".\" else \"${d}\" end)}" ${d}/source.json)
                 workspace=$(echo "${workspace}" | sed -e 's;https://github.com/;;')
                 echo -n "${comma} ${workspace}"
                 comma=','
@@ -118,7 +118,7 @@ jobs:
           echo "workspaces=${json}" >> $GITHUB_OUTPUT
   export:
     needs: prepare
-    uses: redhat-developer/rhdh-plugin-export-utils/.github/workflows/export-dynamic.yaml@main
+    uses: davidfestal/rhdh-plugin-export-utils/.github/workflows/export-dynamic.yaml@multi-plugins-repo
     strategy:
       fail-fast: false
       matrix:
@@ -130,6 +130,7 @@ jobs:
       plugins-root: ${{ matrix.workspace.plugins-root }}
       overlay-repo: ${{ github.repository }}
       overlay-repo-ref: ${{ needs.prepare.outputs.overlay-repo-ref }}
+      overlay-root: ${{ matrix.workspace.overlay-root }}
       node-version: ${{ needs.prepare.outputs.node-version }}
       janus-cli-version: ${{ needs.prepare.outputs.janus-cli-version }}
       upload-project-on-error: ${{ inputs.upload-project-on-error == 'true' }}

@@ -53,7 +53,7 @@ runs:
             core,
             overlayRepoOwner,
             overlayRepoName,
-            overlyRepoBranchName: '${{ inputs.overlay-repo-branch-name }}',
+            overlayRepoBranchName: '${{ inputs.overlay-repo-branch-name }}',
             targetPRBranchName: '${{ inputs.target-pr-branch-name }}',
             backstageVersion: '${{ inputs.backstage-version }}',
             workspaceName: '${{ inputs.workspace-name }}',

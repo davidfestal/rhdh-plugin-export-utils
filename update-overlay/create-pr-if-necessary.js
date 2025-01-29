@@ -14,8 +14,6 @@ module.exports = async ({
   pluginDirectories
 }) => {
   try {
-    console.log('In the method !!!!');
-/*    
     const githubClient = github.rest;
     
     const workspacePath = `workspaces/${workspaceName}`;
@@ -169,7 +167,6 @@ module.exports = async ({
     .addLink(workspaceName, workspaceLink)
     .addRaw(` at commit ${workspaceCommit.substring(0,7)} for backstage ${backstageVersion}`)
     .write();
-*/
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.stack);

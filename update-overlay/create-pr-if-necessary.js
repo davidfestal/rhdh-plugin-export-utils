@@ -23,7 +23,7 @@ module.exports = async ({
     const sourceJsonContent = JSON.stringify({
       repo: pluginsRepoUrl,
       "repo-ref": workspaceCommit,
-      flat: pluginsRepoFlat,
+      "repo-flat": pluginsRepoFlat,
     });
 
     const workspaceLink = pluginsRepoFlat ?

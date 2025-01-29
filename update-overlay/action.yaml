@@ -60,6 +60,6 @@ runs:
             workspaceCommit: '${{ inputs.workspace-commit }}',
             pluginsRepoOwner,
             pluginsRepoName,
-            pluginsRepoFlat: '${{ inputs.plugins-repo-flat }},
+            pluginsRepoFlat: ${{ inputs.plugins-repo-flat }},
             pluginDirectories: '${{ inputs.plugin-directories }}'
           });

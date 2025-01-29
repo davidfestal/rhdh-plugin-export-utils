@@ -107,6 +107,8 @@ module.exports = async ({
 
     const latestCommitSha = response.data[0].sha;
     const treeSha = response.data[0].commit.tree.sha;
+    
+    console.log(`treeSha: ${treeSha}`);
 
     const treeResponse = await githubClient.git.createTree({
       owner: overlayRepoOwner,

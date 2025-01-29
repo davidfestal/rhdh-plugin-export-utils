@@ -283,3 +283,6 @@ jobs:
           plugins-repo-flat: ${{ steps.prepare.outputs.plugins-repo-flat }}
           plugin-directories: ${{ steps.prepare.outputs.plugin-directories }}
     
+    permissions:
+      contents: write
+      

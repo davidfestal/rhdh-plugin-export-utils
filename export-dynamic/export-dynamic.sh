@@ -62,10 +62,17 @@ do
         npx --yes @janus-idp/cli@${INPUTS_JANUS_CLI_VERSION} package package-dynamic-plugins --tag $PLUGIN_CONTAINER_TAG
         if [ $? -eq 0 ] 
         then
-            echo "========== Publishing Container ${PLUGIN_CONTAINER_TAG} =========="
-            podman push $PLUGIN_CONTAINER_TAG
+            if [[ "${INPUTS_PUBLISH_CONTAINER_IMAGE}" == "true" ]]
+            then
+                echo "========== Publishing Container ${PLUGIN_CONTAINER_TAG} =========="
+                podman push $PLUGIN_CONTAINER_TAG
+            fi
         else
             echo " Error building container image"
+            errors="${errors}\n${pluginPath}"
+            set -e
+            popd > /dev/null
+            continue
         fi
     fi
 
@@ -96,8 +103,9 @@ do
             echo "  copying default app-config"
             cp -v "${optionalConfigFile}" "$packDestination/${filename}.${INPUTS_APP_CONFIG_FILE_NAME}"
         fi
-        popd > /dev/null
     fi
+    set -e
+    popd > /dev/null
 done
 echo "Plugins with failed exports: $errors"
 echo "ERRORS=$errors" >> $GITHUB_OUTPUT

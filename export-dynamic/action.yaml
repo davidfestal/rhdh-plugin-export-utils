@@ -66,4 +66,6 @@ runs:
         INPUTS_SCALPRUM_CONFIG_FILE_NAME: "${{ inputs.scalprum-config-file-name }}"
         INPUTS_SOURCE_OVERLAY_FOLDER_NAME: "${{ inputs.source-overlay-folder-name }}"
         INPUTS_IMAGE_REPOSITORY_PREFIX: "${{ inputs.image-repository-prefix }}"
+        INPUTS_PUBLISH_CONTAINER_IMAGE: "true"
+        
       run: ${{ github.action_path }}/export-dynamic.sh

@@ -104,7 +104,7 @@ jobs:
 
               if [[ -f "${d}/plugins-list.yaml" ]] && [[ -f "${d}/source.json" ]]
               then
-                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\" ) | . += { \"overlay-root2\”: \"${d}\", \"plugins-root\": (if .\"plugins-repo-flat\" then \".\" else \"${d}\" end)}" ${d}/source.json)
+                workspace=$(jq -c ". | with_entries(.key = \"plugins-\(.key)\" ) | . += { \"overlay-root\": \"${d}\", \"plugins-root\": (if .\"plugins-repo-flat\" then \".\" else \"${d}\" end)}" ${d}/source.json)
                 workspace=$(echo "${workspace}" | sed -e 's;https://github.com/;;')
                 echo -n "${comma} ${workspace}"
                 comma=','

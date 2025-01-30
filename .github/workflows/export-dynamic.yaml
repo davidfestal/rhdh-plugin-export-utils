@@ -84,9 +84,9 @@ jobs:
 
     env:
       NODE_OPTIONS: --max-old-space-size=8192
-      IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
-      REGISTRY_USER: ${{ github.actor }}
-      REGISTRY_PASSWORD: ${{ github.token }}
+      IMAGE_REPOSITORY_PREFIX: ghcr.io/${{ github.repository_owner }}
+      IMAGE_REGISTRY_USER: ${{ github.actor }}
+      IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
 
     defaults:
       run:
@@ -145,34 +145,34 @@ jobs:
         if: ${{ inputs.publish-container }}
         uses: redhat-actions/podman-login@v1
         with:
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ env.REGISTRY_PASSWORD }}
-          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ env.IMAGE_REGISTRY_USER }}
+          password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
+          registry: ${{ env.IMAGE_REPOSITORY_PREFIX }}
 
-      - name: Set Plugin Base Image Name
+      - name: Set Plugin Image Repository Prefix
         if: ${{ inputs.publish-container }}
         id: set-image-tag-name
         shell: bash
         run: |
-          BASE_IMAGE_TAG_NAME=""
+          IMAGE_REPOSITORY_PREFIX=""
           if [[ "${{ inputs.publish-container  }}" ]]
           then
-            BASE_IMAGE_TAG_NAME="${{ env.IMAGE_REGISTRY }}"
+            IMAGE_REPOSITORY_PREFIX="${{ env.IMAGE_REPOSITORY_PREFIX }}"
           else
             echo "Not publish container image with plugin content"
           fi
-          echo "BASE_IMAGE_TAG_NAME=$BASE_IMAGE_TAG_NAME" >> $GITHUB_OUTPUT
+          echo "IMAGE_REPOSITORY_PREFIX=$IMAGE_REPOSITORY_PREFIX" >> $GITHUB_OUTPUT
 
       - name: Export dynamic plugin packages
         if: ${{ success() }}
         id: export-dynamic
-        uses: redhat-developer/rhdh-plugin-export-utils/export-dynamic@main
+        uses: davidfestal/rhdh-plugin-export-utils/export-dynamic@multi-plugins-repo
         with:
           plugins-root: ${{inputs.plugins-root}}
           plugins-file: ${{ github.workspace }}/overlay-repo/${{inputs.overlay-root}}/plugins-list.yaml
           destination: ${{ github.workspace }}/dynamic-plugin-archives
           janus-cli-version: ${{inputs.janus-cli-version}}
-          base-image-tag-name: ${{ steps.set-image-tag-name.outputs.BASE_IMAGE_TAG_NAME }}
+          image-repository-prefix: ${{ steps.set-image-tag-name.outputs.IMAGE_REPOSITORY_PREFIX }}
 
       - name: Set artifacts name suffix
         id: set-artifacts-name-suffix

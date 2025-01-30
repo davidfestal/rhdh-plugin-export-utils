@@ -19,7 +19,7 @@ module.exports = async ({
     const workspacePath = `workspaces/${workspaceName}`;
     const pluginsRepoUrl = `https://github.com/${pluginsRepoOwner}/${pluginsRepoName}`;
 
-    const pluginsYamlContent = pluginDirectories.replace(new RegExp(`^${workspacePath}/(.*)$`, 'mg'), '$1 :');
+    const pluginsYamlContent = pluginDirectories.replace(new RegExp(`^${workspacePath}/\(.*\)$`, 'mg'), '$1 :');
     const sourceJsonContent = JSON.stringify({
       repo: pluginsRepoUrl,
       "repo-ref": workspaceCommit,

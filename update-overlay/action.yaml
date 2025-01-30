@@ -61,5 +61,5 @@ runs:
             pluginsRepoOwner,
             pluginsRepoName,
             pluginsRepoFlat: ${{ inputs.plugins-repo-flat }},
-            pluginDirectories: '${{ inputs.plugin-directories }}'
+            pluginDirectories: `${{ inputs.plugin-directories }}`
           });

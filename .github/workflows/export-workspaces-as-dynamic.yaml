@@ -35,7 +35,7 @@ on:
         description: Publish a container image for the dynamic plugins
         required: false
         type: boolean
-        default: false
+        default: true
 
 
 jobs:

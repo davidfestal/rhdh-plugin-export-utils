@@ -13,7 +13,8 @@ inputs:
 
   destination:
     description: Absolute path of the folder that should receive all the targz archives.
-    required: true
+    required: false
+    default: ""
 
   janus-cli-version:
     description: Version of the janus-idp/cli package.
@@ -38,7 +39,7 @@ inputs:
     required: false
     default: overlay
 
-  base-image-tag-name:
+  image-repository-prefix:
     description: Base image tag name to publish dynamic plugins as container image
     default: ""
     required: false
@@ -64,5 +65,5 @@ runs:
         INPUTS_APP_CONFIG_FILE_NAME: "${{ inputs.app-config-file-name }}"
         INPUTS_SCALPRUM_CONFIG_FILE_NAME: "${{ inputs.scalprum-config-file-name }}"
         INPUTS_SOURCE_OVERLAY_FOLDER_NAME: "${{ inputs.source-overlay-folder-name }}"
-        INPUTS_BASE_IMAGE_TAG_NAME: "${{ inputs.base-image-tag-name }}"
+        INPUTS_IMAGE_REPOSITORY_PREFIX: "${{ inputs.image-repository-prefix }}"
       run: ${{ github.action_path }}/export-dynamic.sh

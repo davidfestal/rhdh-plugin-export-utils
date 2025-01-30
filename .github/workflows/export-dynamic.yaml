@@ -150,6 +150,7 @@ jobs:
           registry: ${{ env.IMAGE_REGISTRY }}
 
       - name: Set Plugin Base Image Name
+        if: ${{ inputs.publish-container }}
         id: set-image-tag-name
         shell: bash
         run: |

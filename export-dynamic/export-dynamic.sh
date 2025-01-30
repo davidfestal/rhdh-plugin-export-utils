@@ -27,6 +27,8 @@ do
         then
             args="$args --scalprum-config ${optionalScalprumConfigFile}"
         fi
+    else
+        pluginType=backend
     fi
     
     echo "========== Exporting $pluginType plugin $pluginPath =========="
@@ -55,8 +57,8 @@ do
         PLUGIN_NAME=$(grep -o  '"name":\s*".*"' package.json  | cut -d' ' -f2-| sed 's/"//g; s/\//-/g; s/@//g')
         PLUGIN_VERSION=$(grep -o  '"version":\s*".*"' package.json  | cut -d' ' -f2- | sed 's/"//g; s/^://g')
         PLUGIN_CONTAINER_TAG="${INPUTS_IMAGE_REPOSITORY_PREFIX}/${PLUGIN_NAME}:${PLUGIN_VERSION}"
-        echo "========== Packaging Container ${PLUGIN_CONTAINER_TAG} =========="
 
+        echo "========== Packaging Container ${PLUGIN_CONTAINER_TAG} =========="
         npx --yes @janus-idp/cli@${INPUTS_JANUS_CLI_VERSION} package package-dynamic-plugins --tag $PLUGIN_CONTAINER_TAG
         if [ $? -eq 0 ] 
         then
@@ -69,6 +71,8 @@ do
 
     if [[ "${INPUTS_DESTINATION}" != "" ]]
     then
+        echo "========== Moving $pluginType plugin $pluginPath archive into ${INPUTS_DESTINATION} =========="
+
         packDestination=${INPUTS_DESTINATION}
         mkdir -pv ${packDestination}
 
